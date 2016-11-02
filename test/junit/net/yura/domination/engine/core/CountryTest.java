@@ -3,7 +3,7 @@ package net.yura.domination.engine.core;
 import org.junit.Test;
 import junit.framework.TestCase;
 import java.util.List;
-import java.util.ArrayList;
+import java.util.Collections;
 
 public class CountryTest extends TestCase{
 	
@@ -12,21 +12,19 @@ public class CountryTest extends TestCase{
 	private Country neighbour2;
 	private Country nonNeightbour;
 	private Country crossContinentNeighbour;
-	private Continent Continent;
+	private Continent continent;
 	private Continent neighbourContinent;
 	private List<Country> crossContinentCountries;
         
 	protected void setUp() {
-		Continent = new Continent("timmay", "North Murca", 5, 8);
+		continent = new Continent("timmay", "North Murca", 5, 8);
 		neighbourContinent = new Continent("beep", "South Murca", 3, 10);
-		country = new Country(0, "1", "zimbabwe", Continent, 100, 100);
-		neighbour1 = new Country(0, "2", "Kansas", Continent, 200,200);
-		neighbour2 = new Country(0, "3", "Mississippi", Continent, 150,300);
-		nonNeightbour = new Country(0, "4", "Maine", Continent, 10,90);
-		crossContinentNeighbour = new Country(0, "4", "Alaska", neighbourContinent, 10,90);
-                crossContinentCountries = new ArrayList<Country>(2);
-                crossContinentCountries.add(crossContinentNeighbour);
-                
+		country = new Country(0, "1", "zimbabwe", continent, 100, 100);
+		neighbour1 = new Country(0, "2", "Kansas", continent, 200, 200);
+		neighbour2 = new Country(0, "3", "Mississippi", continent, 150, 300);
+		nonNeightbour = new Country(0, "4", "Maine", continent, 10, 90);
+		crossContinentNeighbour = new Country(0, "4", "Alaska", neighbourContinent, 10, 90);
+                crossContinentCountries = Collections.singletonList(crossContinentNeighbour);                
 	}
 	@Test
 	public void testNeighbours() {
@@ -38,7 +36,7 @@ public class CountryTest extends TestCase{
 		country.addNeighbour(neighbour2);
 		assertTrue(country.isNeighbours(neighbour2));
                 
-                assertEquals(new ArrayList<Country>(2), country.getCrossContinentNeighbours());
+                assertEquals(Collections.emptyList(), country.getCrossContinentNeighbours());
                 
                 assertFalse(country.isNeighbours(crossContinentNeighbour));
 		country.addNeighbour(crossContinentNeighbour);
