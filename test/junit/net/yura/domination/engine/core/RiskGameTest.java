@@ -9,12 +9,22 @@ import net.yura.domination.engine.RiskUIUtil;
  */
 public class RiskGameTest extends TestCase {
     
+    RiskGame instance;
+    
     public RiskGameTest(String testName) {
         super(testName);
     }
 
     protected void setUp() throws Exception {
         super.setUp();
+        
+        try {
+            RiskUIUtil.mapsdir = new File("./game/Domination/maps").toURI().toURL();
+            instance = new RiskGame();
+        }
+        catch(Exception ex) {
+            throw new RuntimeException(ex);
+        }
     }
 
     protected void tearDown() throws Exception {
@@ -26,16 +36,7 @@ public class RiskGameTest extends TestCase {
      */
     public void testTrade() {
         System.out.println("trade");
-
-        RiskGame instance;
-        try {
-            RiskUIUtil.mapsdir = new File("./game/Domination/maps").toURI().toURL();
-            instance = new RiskGame();
-        }
-        catch(Exception ex) {
-            throw new RuntimeException(ex);
-        }
-
+      
         //Country country =  new Country(1, "name", "Full Name", new Continent("name", "Full Name", 5, 0xFFFF0000), 10, 10);
 
         // 3 different cards = there are 24 combinations
@@ -353,4 +354,5 @@ public class RiskGameTest extends TestCase {
         
     }
 
+    
 }
