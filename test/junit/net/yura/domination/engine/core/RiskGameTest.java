@@ -3,13 +3,17 @@ package net.yura.domination.engine.core;
 import java.io.File;
 import junit.framework.TestCase;
 import net.yura.domination.engine.RiskUIUtil;
+import net.yura.domination.engine.core.*;
 
 /**
  * @author Yur Mamyrin
  */
 public class RiskGameTest extends TestCase {
     
-    RiskGame instance;
+    private Continent continent;
+    private Country country;
+    private Player p1;
+    private Player p2;
     
     public RiskGameTest(String testName) {
         super(testName);
@@ -18,13 +22,12 @@ public class RiskGameTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         
-        try {
-            RiskUIUtil.mapsdir = new File("./game/Domination/maps").toURI().toURL();
-            instance = new RiskGame();
-        }
-        catch(Exception ex) {
-            throw new RuntimeException(ex);
-        }
+        
+        
+        continent = new Continent("timmay", "North Murca", 5, 8);
+        country = new Country(0, "1", "zimbabwe", continent, 100, 100);
+        p1 = new Player(0, "tester", 7, "here");    
+        p2 = new Player(0, "tester2", 9, "there");
     }
 
     protected void tearDown() throws Exception {
@@ -37,8 +40,17 @@ public class RiskGameTest extends TestCase {
     public void testTrade() {
         System.out.println("trade");
       
-        //Country country =  new Country(1, "name", "Full Name", new Continent("name", "Full Name", 5, 0xFFFF0000), 10, 10);
+        RiskGame instance;
 
+        try {
+            RiskUIUtil.mapsdir = new File("./game/Domination/maps").toURI().toURL();
+            instance = new RiskGame();
+        }
+        catch(Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        
+        //Country country =  new Country(1, "name", "Full Name", new Continent("name", "Full Name", 5, 0xFFFF0000), 10, 10);
         // 3 different cards = there are 24 combinations
 
         assertEquals(4, instance.getTradeAbsValue(Card.CANNON, Card.INFANTRY, Card.CAVALRY, RiskGame.CARD_INCREASING_SET) );
@@ -354,5 +366,37 @@ public class RiskGameTest extends TestCase {
         
     }
 
+    public void testAddDelPlayers()
+    {
+        RiskGame instance;
+
+        try {
+            RiskUIUtil.mapsdir = new File("./game/Domination/maps").toURI().toURL();
+            instance = new RiskGame();
+        }
+        catch(Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        
+        assertFalse(instance.delPlayer("tester"));
+        
+        assertTrue(instance.addPlayer(0, "tester", 7, "here"));
+        assertTrue(instance.addPlayer(0, "tester2", 9, "there"));
+        
+        assertFalse(instance.delPlayer("tester3"));
+        
+        assertTrue(instance.addPlayer(0, "tester3", 11, "where"));
+        assertTrue(instance.delPlayer("tester3"));
+        
+        try {
+            instance.startGame(0, 0, true, true);
+        }
+        catch(Exception ex) {
+            fail();
+        }
+        
+        assertFalse(instance.addPlayer(0, "fail", 0, "nowhere"));
+        assertFalse(instance.delPlayer("tester"));
+    }
     
 }
