@@ -3,7 +3,6 @@ package net.yura.domination.engine.core;
 import java.io.File;
 import junit.framework.TestCase;
 import net.yura.domination.engine.RiskUIUtil;
-import net.yura.domination.engine.core.*;
 
 /**
  * @author Yur Mamyrin
