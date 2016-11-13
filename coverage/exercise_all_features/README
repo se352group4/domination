@@ -1,0 +1,17 @@
+In this coverage run, I attempted to use all features and options in
+Domination.
+
+This includes:
+- Play each of the three game types
+- Play with the options recycle cards and auto place on and off
+- Play with auto end and auto defend on and off
+- Start/Stop Server
+- Save and Load Game
+- Help Manual
+- Join Game, where it fails to connect to localhost when a server is not
+  running.
+- About
+- Play Online:
+	- Watch a game
+	- Change nick name
+	- Switch among all tabs
