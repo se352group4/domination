@@ -588,4 +588,19 @@ public class RiskGameTest extends TestCase {
             }
         }
     }
+    
+    public void testFindCardAndRemoveIt()
+    {
+        RiskGame instance = checkPlayerWonSetup();
+        int count = instance.getCards().size();
+        assertEquals(Card.WILDCARD, instance.findCardAndRemoveIt(Card.WILDCARD).getName());
+        count -= 1;
+        assertEquals(count, instance.getCards().size());
+        assertEquals("Congo", instance.findCardAndRemoveIt("23").getCountry().getName());
+        count -= 1;
+        assertEquals(count, instance.getCards().size());
+        
+        
+        
+    }
 }
