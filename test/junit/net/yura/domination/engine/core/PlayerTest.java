@@ -66,37 +66,53 @@ public class PlayerTest extends TestCase {
 
     public void testGetNoArmies() {
         System.out.println("getNoArmies");
-        // player.getNoArmies();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        Player player = createTestPlayer();
+        assertEquals(0, player.getNoArmies());
+
+        Country country1 = new Country();
+        player.newCountry(country1);
+        country1.addArmies(4);
+        assertEquals(4, player.getNoArmies());
+
+        Country country2 = new Country();
+        player.newCountry(country2);
+        country2.addArmies(5);
+        assertEquals(9, player.getNoArmies());
+
+        player.lostCountry(country2);
+        assertEquals(4, player.getNoArmies());
     }
 
-    public void testAddArmies() {
-        System.out.println("addArmies");
-        // player.addArmies(n);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    public void testLoseExtraArmy() {
-        System.out.println("loseExtraArmy");
-        // player.loseExtraArmy(n);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
-
-    public void testGiveCard() {
-        System.out.println("giveCard");
-        // player.giveCard(card);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+    public void testManipulateExtraArmies() {
+        System.out.println("ManipulateExtraArmies");
+        Player player = createTestPlayer();
+        assertEquals(0, player.getExtraArmies());
+        player.addArmies(20);
+        assertEquals(20, player.getExtraArmies());
+        player.loseExtraArmy(3);
+        assertEquals(17, player.getExtraArmies());
     }
 
     public void testTakeCard() {
         System.out.println("takeCard");
-        // player.takeCard();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        Player player = createTestPlayer();
+
+        assertEquals(0, player.getCards().size());
+
+        Country country = new Country();
+        Card card1 = new Card(Card.CANNON, country);
+        Card card2 = new Card(Card.INFANTRY, country);
+        player.giveCard(card1);
+
+        assertEquals(card1, player.takeCard());
+        assertEquals(0, player.getCards().size());
+
+        player.giveCard(card1);
+        player.giveCard(card2);
+
+        assertEquals(card1, player.takeCard());
+        assertEquals(1, player.getCards().size());
+        assertEquals(card2, player.getCards().get(0));
     }
 
     public void testTradeInCards() {
@@ -111,7 +127,6 @@ public class PlayerTest extends TestCase {
         player.newCountry(country1);
         player.newCountry(country2);
         player.newCountry(country3);
-        player.newCountry(country4);
 
         Card card1 = new Card(Card.CAVALRY, country1);
         Card card2 = new Card(Card.CANNON, country2);
@@ -129,41 +144,92 @@ public class PlayerTest extends TestCase {
         assertEquals(0, country4.getArmies());
 
         assertEquals(0, player.getCards().size());
+
+        Card card4 = new Card(Card.WILDCARD, country4);
+
+        player.giveCard(card4);
+        player.giveCard(card2);
+        player.giveCard(card3);
+
+        player.tradeInCards(card4, card2, card3);
+
+        assertEquals(Player.noaFORcard, country1.getArmies());
+        assertEquals(Player.noaFORcard, country2.getArmies());
+        assertEquals(0, country3.getArmies());
+        assertEquals(0, country4.getArmies());
+
+        assertEquals(0, player.getCards().size());
+
+        Country country5 = new Country();
+        Card card5 = new Card(Card.INFANTRY, country5);
+
+        player.giveCard(card4);
+        player.giveCard(card5);
+        player.giveCard(card3);
+
+        player.tradeInCards(card4, card5, card3);
+
+        assertEquals(Player.noaFORcard, country1.getArmies());
+        assertEquals(Player.noaFORcard, country2.getArmies());
+        assertEquals(Player.noaFORcard, country3.getArmies());
+        assertEquals(0, country4.getArmies());
+        assertEquals(0, country5.getArmies());
+
+        assertEquals(0, player.getCards().size());
+
+        Country country6 = new Country();
+        Card card6 = new Card(Card.WILDCARD, country6);
+
+        player.giveCard(card4);
+        player.giveCard(card5);
+        player.giveCard(card6);
+
+        player.tradeInCards(card4, card5, card6);
+
+        assertEquals(0, country4.getArmies());
+        assertEquals(0, country5.getArmies());
+        assertEquals(0, country6.getArmies());
+
+        assertEquals(0, player.getCards().size());
     }
 
-    public void testGetNoTerritoriesOwned() {
-        System.out.println("getNoTerritoriesOwned");
-        // player.getNoTerritoriesOwned();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+    public void testManipulateCountries() {
+        System.out.println("ManipulateCountries");
+        Player player = createTestPlayer();
+        assertEquals(0, player.getNoTerritoriesOwned());
 
-    public void testNewCountry() {
-        System.out.println("newCountry");
-        // player.newCountry(newCountry);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+        Country country1 = new Country();
+        player.newCountry(country1);
+        assertEquals(1, player.getNoTerritoriesOwned());
 
-    public void testLostCountry() {
-        System.out.println("lostCountry");
-        // player.lostCountry(lessCountry);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
-    }
+        Country country2 = new Country();
+        player.newCountry(country2);
+        assertEquals(2, player.getNoTerritoriesOwned());
 
-    public void testAddPlayersEliminated() {
-        System.out.println("addPlayersEliminated");
-        // player.addPlayersEliminated(p);
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+        player.lostCountry(country1);
+        assertEquals(1, player.getNoTerritoriesOwned());
+
+        assertEquals(country2, player.getTerritoriesOwned().get(0));
     }
 
     public void testIsAlive() {
         System.out.println("isAlive");
-        // player.isAlive();
-        // TODO review the generated test code and remove the default call to fail.
-        fail("The test case is a prototype.");
+
+        Player player = createTestPlayer();
+        assertFalse(player.isAlive());
+
+        Country country1 = new Country();
+        player.newCountry(country1);
+        assertTrue(player.isAlive());
+
+        player.addArmies(2);
+        assertTrue(player.isAlive());
+
+        player.lostCountry(country1);
+        assertTrue(player.isAlive());
+
+        player.loseExtraArmy(2);
+        assertFalse(player.isAlive());
     }
 
 }
