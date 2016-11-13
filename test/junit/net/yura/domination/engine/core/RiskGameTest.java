@@ -9,6 +9,14 @@ public class RiskGameTest extends TestCase {
     private Continent continent;
     private Country country1;
     private Country country2;
+    private Country country3;
+    private Country country4;
+    private Country country5;
+    private Country country6;
+    private Country country7;
+    private Country country8;
+    private Country country9;
+    private Country country10;
     private Player p1;
     private Player p2;
     
@@ -22,6 +30,14 @@ public class RiskGameTest extends TestCase {
         continent = new Continent("timmay", "North Murca", 5, 8);
         country1 = new Country(0, "1", "zimbabwe", continent, 100, 100);
         country2 = new Country(1, "2", "Djibouti", continent, 200, 200);
+        country3 = new Country(2, "3", "tom", continent, 300, 100);
+        country4 = new Country(3, "4", "bob", continent, 200, 300);
+        country5 = new Country(4, "5", "here", continent, 500, 100);
+        country6 = new Country(5, "6", "there", continent, 200, 500);
+        country7 = new Country(6, "7", "where", continent, 400, 100);
+        country8 = new Country(7, "8", "murca", continent, 200, 400);
+        country9 = new Country(8, "9", "canada", continent, 500, 500);
+        country10 = new Country(9, "10", "mexico", continent, 400, 400);
         p1 = new Player(0, "tester", 7, "here");    
         p2 = new Player(0, "tester2", 9, "there");
     }
@@ -494,14 +510,7 @@ public class RiskGameTest extends TestCase {
     {
          RiskGame instance = checkPlayerWonSetup();
         
-        Country country3 = new Country(2, "3", "tom", continent, 300, 100);
-        Country country4 = new Country(3, "4", "bob", continent, 200, 300);
-        Country country5 = new Country(4, "5", "here", continent, 500, 100);
-        Country country6 = new Country(5, "6", "there", continent, 200, 500);
-        Country country7 = new Country(6, "7", "where", continent, 400, 100);
-        Country country8 = new Country(7, "8", "murca", continent, 200, 400);
-        Country country9 = new Country(8, "9", "canada", continent, 500, 500);
-        Country country10 = new Country(9, "10", "mexico", continent, 400, 400);
+        
         
         country1.addNeighbour(country2);
         country1.addNeighbour(country3);
@@ -555,5 +564,10 @@ public class RiskGameTest extends TestCase {
         p1.newCountry(country5);
         
         assertEquals(10, instance.getConnectedEmpire(p1).size());
+        try 
+        {
+        setUp();
+        }
+        catch (Exception e) {}
     }
 }
