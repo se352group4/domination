@@ -4,13 +4,11 @@ import java.io.File;
 import junit.framework.TestCase;
 import net.yura.domination.engine.RiskUIUtil;
 
-/**
- * @author Yur Mamyrin
- */
 public class RiskGameTest extends TestCase {
     
     private Continent continent;
-    private Country country;
+    private Country country1;
+    private Country country2;
     private Player p1;
     private Player p2;
     
@@ -21,10 +19,9 @@ public class RiskGameTest extends TestCase {
     protected void setUp() throws Exception {
         super.setUp();
         
-        
-        
         continent = new Continent("timmay", "North Murca", 5, 8);
-        country = new Country(0, "1", "zimbabwe", continent, 100, 100);
+        country1 = new Country(0, "1", "zimbabwe", continent, 100, 100);
+        country2 = new Country(1, "2", "Djibouti", continent, 200, 200);
         p1 = new Player(0, "tester", 7, "here");    
         p2 = new Player(0, "tester2", 9, "there");
     }
