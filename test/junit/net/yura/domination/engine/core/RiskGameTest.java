@@ -489,4 +489,71 @@ public class RiskGameTest extends TestCase {
         //There should be an empty country now
         assertFalse(instance.NoEmptyCountries());
     }
+    
+     public void testGetConnectedEmpire()
+    {
+         RiskGame instance = checkPlayerWonSetup();
+        
+        Country country3 = new Country(2, "3", "tom", continent, 300, 100);
+        Country country4 = new Country(3, "4", "bob", continent, 200, 300);
+        Country country5 = new Country(4, "5", "here", continent, 500, 100);
+        Country country6 = new Country(5, "6", "there", continent, 200, 500);
+        Country country7 = new Country(6, "7", "where", continent, 400, 100);
+        Country country8 = new Country(7, "8", "murca", continent, 200, 400);
+        Country country9 = new Country(8, "9", "canada", continent, 500, 500);
+        Country country10 = new Country(9, "10", "mexico", continent, 400, 400);
+        
+        country1.addNeighbour(country2);
+        country1.addNeighbour(country3);
+        country2.addNeighbour(country1);
+        country2.addNeighbour(country4);
+        country3.addNeighbour(country1);
+        country3.addNeighbour(country5);
+        country4.addNeighbour(country2);
+        country4.addNeighbour(country6);
+        country4.addNeighbour(country7);
+        country5.addNeighbour(country3);
+        country5.addNeighbour(country8);
+        country5.addNeighbour(country9);
+        country6.addNeighbour(country4);
+        country6.addNeighbour(country7);
+        country7.addNeighbour(country4);
+        country7.addNeighbour(country6);
+        country8.addNeighbour(country9);
+        country8.addNeighbour(country5);
+        country9.addNeighbour(country5);
+        country9.addNeighbour(country8);
+        country9.addNeighbour(country10);
+        country10.addNeighbour(country9);
+        
+        
+        Country[] array = new Country[10];
+        array[0] = country1;
+        array[1] = country2;
+        array[2] = country3;
+        array[3] = country4;
+        array[4] = country5;
+        array[5] = country6;
+        array[6] = country7;
+        array[7] = country8;
+        array[8] = country9;
+        array[9] = country10;
+        
+        for(Country c : array) 
+        {
+            c.setOwner(p1);
+            p1.newCountry(c);
+        }
+        p1.lostCountry(country5);
+        country5.setOwner(p2);
+        p2.newCountry(country5);
+        
+        assertEquals(6, instance.getConnectedEmpire(p1).size());
+        
+        p2.lostCountry(country5);
+        country5.setOwner(p1);
+        p1.newCountry(country5);
+        
+        assertEquals(10, instance.getConnectedEmpire(p1).size());
+    }
 }
