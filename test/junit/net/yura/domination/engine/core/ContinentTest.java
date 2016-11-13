@@ -23,6 +23,9 @@ public class ContinentTest extends TestCase {
         
         continent.addTerritoriesContained(country);
         assertTrue(continent.getTerritoriesContained().contains(country));
+        
+        continent.addTerritoriesContained(country2);
+        assertTrue(continent.getTerritoriesContained().contains(country2));
     }
     
     public void testGetOwner() {
