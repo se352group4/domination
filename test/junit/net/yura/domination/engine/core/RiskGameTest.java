@@ -467,4 +467,29 @@ public class RiskGameTest extends TestCase {
         assertFalse(instance.checkPlayerWon());
     }
 
+    public void testNoEmptyCountries()
+    {
+        RiskGame instance = checkPlayerWonSetup();
+
+        //There are empty countries initially
+        assertFalse(instance.NoEmptyCountries());
+        
+        // Set up the player to own countries
+        instance.setCurrentPlayer(1);
+        Player plyr = instance.getCurrentPlayer();
+        
+        Country[] cList = instance.getCountries();
+        
+        // Set up the player to own all the countries
+        for(Country c : cList) c.setOwner(plyr);
+        
+        //There should be no empty countries now
+        assertTrue(instance.NoEmptyCountries());
+        
+        // make a single country empty
+        if (cList.length > 0) cList[0].setOwner(null);
+        
+        //There should be an empty country now
+        assertFalse(instance.NoEmptyCountries());
+    }
 }
