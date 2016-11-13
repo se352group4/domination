@@ -449,4 +449,22 @@ public class RiskGameTest extends TestCase {
         assertTrue(instance.checkPlayerWon());
     }
     
+    public void testCheckPlayerWonWithAllButOneCountries()
+    {
+        RiskGame instance = checkPlayerWonSetup();
+        
+        // Set up the player to win
+        instance.setCurrentPlayer(1);
+        Player plyr = instance.getCurrentPlayer();
+        
+        Country[] cList = instance.getCountries();
+        
+        // Set up the player to own all the countries but one
+        for(Country c : cList) c.setOwner(plyr);
+        if (cList.length > 0) cList[0].setOwner(null);
+        
+        // The player should not have won
+        assertFalse(instance.checkPlayerWon());
+    }
+
 }
