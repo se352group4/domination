@@ -398,7 +398,7 @@ public class RiskGameTest extends TestCase {
         assertFalse(instance.delPlayer("tester"));
     }
     
-        public void testCheckPlayerWon()
+    private RiskGame checkPlayerWonSetup()
     {
         RiskGame instance;
 
@@ -422,9 +422,31 @@ public class RiskGameTest extends TestCase {
         catch(Exception ex) {
             fail();
         }
-        
+        return instance;
+    }
+
+    public void testCheckPlayerWonImmediate()
+    {
+        RiskGame instance = checkPlayerWonSetup();
         // No player should have won right after the game starts
         assertFalse(instance.checkPlayerWon());
+    }
+
+    public void testCheckPlayerWonWithAllCountries()
+    {
+        RiskGame instance = checkPlayerWonSetup();
+        
+        // Set up the player to win
+        instance.setCurrentPlayer(1);
+        Player plyr = instance.getCurrentPlayer();
+        
+        // Set up the play to own all the countries
+        for(Country c : instance.getCountries()){
+            c.setOwner(plyr);
+        }
+        
+        // The player should have won
+        assertTrue(instance.checkPlayerWon());
     }
     
 }
