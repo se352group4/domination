@@ -1,7 +1,9 @@
 package net.yura.domination.engine.core;
 
 import java.io.File;
+import java.util.Vector;
 import junit.framework.TestCase;
+import net.yura.domination.engine.ColorUtil;
 import net.yura.domination.engine.RiskUIUtil;
 
 public class RiskGameTest extends TestCase {
@@ -618,4 +620,71 @@ public class RiskGameTest extends TestCase {
         assertEquals(Card.WILDCARD, c[2].getName());
         
     }
+
+    public void testMoveArmiesDuringAttack() {
+        RiskGame game;
+        try {
+            RiskUIUtil.mapsdir = new File("./game/Domination/maps").toURI().toURL();
+            game = new RiskGame();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+
+        String cyanPlayerName = "cyan_player";
+        String greenPlayerName = "green_player";
+
+        assertTrue(game.addPlayer(Player.PLAYER_HUMAN, cyanPlayerName, ColorUtil.CYAN, "address"));
+        assertTrue(game.addPlayer(Player.PLAYER_HUMAN, greenPlayerName, ColorUtil.GREEN, "address"));
+
+        try {
+            game.startGame(RiskGame.MODE_DOMINATION, RiskGame.CARD_INCREASING_SET, true, false);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+
+        Country[] countries = game.getCountries();
+        assertTrue(countries.length >= 2);
+
+        Vector players = game.getPlayers();
+        assertEquals(2, players.size());
+
+        assertEquals(RiskGame.STATE_PLACE_ARMIES, game.getState());
+        assertFalse(game.getSetupDone());
+
+        Player cyanPlayer = game.getPlayer(cyanPlayerName);
+        Player greenPlayer = game.getPlayer(greenPlayerName);
+
+        assertEquals(40, cyanPlayer.getExtraArmies());
+        assertEquals(40, greenPlayer.getExtraArmies());
+        cyanPlayer.loseExtraArmy(39);
+        greenPlayer.loseExtraArmy(39);
+
+        game.setCurrentPlayer(0);
+
+        assertEquals(cyanPlayer, game.getCurrentPlayer());
+        game.placeArmy(countries[0], 1);
+        game.endGo();
+
+        assertEquals(greenPlayer, game.getCurrentPlayer());
+        game.placeArmy(countries[1], 1);
+        game.endGo();
+
+        assertEquals(cyanPlayer, game.getCurrentPlayer());
+        game.placeArmy(countries[0], 1);
+        game.placeArmy(countries[0], 1);
+        game.placeArmy(countries[0], 1);
+        assertEquals(RiskGame.STATE_ATTACKING, game.getState());
+        assertEquals(0, cyanPlayer.getExtraArmies());
+
+        game.endAttack();
+        game.noMove();
+        game.endGo();
+
+        assertEquals(greenPlayer, game.getCurrentPlayer());
+        game.placeArmy(countries[1], 1);
+        game.endGo();
+
+        fail("prototype");
+    }
+
 }
