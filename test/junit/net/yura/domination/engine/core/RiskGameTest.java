@@ -398,4 +398,33 @@ public class RiskGameTest extends TestCase {
         assertFalse(instance.delPlayer("tester"));
     }
     
+        public void testCheckPlayerWon()
+    {
+        RiskGame instance;
+
+        try {
+            RiskUIUtil.mapsdir = new File("./game/Domination/maps").toURI().toURL();
+            instance = new RiskGame();
+        }
+        catch(Exception ex) {
+            throw new RuntimeException(ex);
+        }
+        
+        try {
+            // Add three players
+            instance.addPlayer(0, "tester1", 1, "one");
+            instance.addPlayer(0, "tester2", 2, "two");
+            instance.addPlayer(0, "tester3", 3, "3");
+            
+            // Start the game
+            instance.startGame(0, 0, true, true);
+        }
+        catch(Exception ex) {
+            fail();
+        }
+        
+        // No player should have won right after the game starts
+        assertFalse(instance.checkPlayerWon());
+    }
+    
 }
