@@ -506,9 +506,9 @@ public class RiskGameTest extends TestCase {
         assertFalse(instance.NoEmptyCountries());
     }
     
-     public void testGetConnectedEmpire()
+    public void testGetConnectedEmpire()
     {
-         RiskGame instance = checkPlayerWonSetup();
+        RiskGame instance = checkPlayerWonSetup();
         
         
         
@@ -569,5 +569,23 @@ public class RiskGameTest extends TestCase {
         setUp();
         }
         catch (Exception e) {}
+    }
+     
+    public void testRollDice()
+    {
+        RiskGame instance = checkPlayerWonSetup();
+        
+        int lastDie = 0;
+        
+        for(int i : instance.rollDice(5))
+        {
+            if(lastDie == 0)
+                lastDie = i;
+            else
+            {
+                assertTrue(i <= lastDie);
+                lastDie = i;
+            }
+        }
     }
 }
