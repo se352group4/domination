@@ -23,6 +23,9 @@ public class RiskGameTest extends TestCase {
     private Country country10;
     private Player p1;
     private Player p2;
+    private Player plr1;
+    private Player plr2;
+    private Country[] countries;
     
     public RiskGameTest(String testName) {
         super(testName);
@@ -402,10 +405,9 @@ public class RiskGameTest extends TestCase {
     private void addPlayersAndStart()
     {
         try {
-            // Add three players
+            // Add players
             instance.addPlayer(0, "tester1", 1, "one");
             instance.addPlayer(0, "tester2", 2, "two");
-            instance.addPlayer(0, "tester3", 3, "3");
             
             // Start the game
             instance.startGame(0, 0, true, true);
@@ -595,4 +597,88 @@ public class RiskGameTest extends TestCase {
         assertEquals(Card.WILDCARD, c[2].getName());
         
     }
+
+    private void getToSetupDone() {
+        // Set up with 2 players
+        assertEquals(0, instance.getPlayers().size());
+        addPlayersAndStart();
+        assertEquals(2, instance.getPlayers().size());
+
+        // Leave Player 1 with 1 army
+        plr1 = instance.getPlayer("tester1");
+        plr1.loseExtraArmy(plr1.getExtraArmies() - 1);
+        assertEquals(1, plr1.getExtraArmies());
+
+        // Leave Player 2 with 1 army
+        plr2 = instance.getPlayer("tester2");
+        plr2.loseExtraArmy(plr2.getExtraArmies() - 1);
+        assertEquals(1, plr2.getExtraArmies());
+
+        // Assertions about the game state
+        countries = instance.getCountries();
+        assertTrue(countries.length > 3);
+        assertTrue(countries[0].isNeighbours(countries[1]));
+        assertEquals(RiskGame.STATE_PLACE_ARMIES, instance.getState());
+
+        // Set player 1 to be the current player
+        instance.setCurrentPlayer(0);
+
+        //PLAYER 1
+        assertEquals(plr1, instance.getCurrentPlayer());
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        assertEquals(0, plr1.getExtraArmies());
+        instance.endGo();
+
+        //PLAYER 2
+        assertEquals(plr2, instance.getCurrentPlayer());
+        assertEquals(1, instance.placeArmy(countries[1], 1));
+        assertEquals(0, plr2.getExtraArmies());
+        instance.endGo();
+
+        assertTrue(instance.getSetupDone());
+    }
+
+    public void testGetNoAttackDice() {
+        getToSetupDone();
+
+        //PLAYER 1
+        assertEquals(plr1, instance.getCurrentPlayer());
+        assertEquals(3, plr1.getExtraArmies());
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        assertEquals(0, plr1.getExtraArmies());
+        instance.endGo();
+
+        assertTrue(instance.getSetupDone());
+
+        assertEquals(RiskGame.STATE_ATTACKING, instance.getState());
+
+        instance.attack(countries[0], countries[1]);
+
+        assertEquals(3, instance.getNoAttackDice());
+    }
+
+    public void testGetNoAttackDiceNegativeArmies() {
+        getToSetupDone();
+        //PLAYER 1
+        assertEquals(plr1, instance.getCurrentPlayer());
+        assertEquals(3, plr1.getExtraArmies());
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        plr1.loseExtraArmy(2);
+        assertEquals(-1, plr1.getExtraArmies());
+        assertEquals(1, instance.placeArmy(countries[0], -1));
+        assertEquals(0, plr1.getExtraArmies());
+        instance.endGo();
+
+        assertTrue(instance.getSetupDone());
+
+        assertEquals(RiskGame.STATE_ATTACKING, instance.getState());
+
+        instance.attack(countries[0], countries[1]);
+
+        assertEquals(3, instance.getNoAttackDice());
+    }
+
 }
