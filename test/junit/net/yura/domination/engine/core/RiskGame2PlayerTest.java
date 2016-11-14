@@ -79,6 +79,21 @@ public class RiskGame2PlayerTest extends TestCase {
         assertEquals(RiskGame.STATE_ATTACKING, game.getState());
         assertEquals(4, country0.getArmies());
         assertEquals(1, country1.getArmies());
+        assertTrue(game.getSetupDone());
+    }
+
+    /**
+     * Cyan attacks country1 with country0, rolls dice, and does a battle.
+     *
+     * @return The battle results
+     */
+    private int[] doWinningBattleCyanAgainstGreen() {
+        game.attack(country0, country1);
+        game.rollA(3);
+        game.rollD(1);
+        int[] attackerRoll = new int[]{6, 6, 6};
+        int[] defenderRoll = new int[]{1};
+        return game.battle(attackerRoll, defenderRoll);
     }
 
     public void testSuccessfulAttack() {
@@ -105,22 +120,32 @@ public class RiskGame2PlayerTest extends TestCase {
     }
 
     public void testBattle() {
-        game.attack(country0, country1);
+        int[] battleResults = doWinningBattleCyanAgainstGreen();
 
-        game.rollA(3);
-        game.rollD(1);
-        int[] attackerRoll = new int[]{6, 6, 6};
-        int[] defenderRoll = new int[]{1};
-
-        int[] battleResults = game.battle(attackerRoll, defenderRoll);
         assertEquals("RiskGame.battle(int[], int[]) failed", 1, battleResults[0]);
-
         assertEquals("Incorrect number of attacker armies lost", 0, battleResults[1]);
         assertEquals("Incorrect number of defender armies lost", 1, battleResults[2]);
         assertTrue("The battle results incorrectly indicates that the attacker lost.", battleResults[3] != 0);
         assertEquals("The battle results incorrectly indicates that the attacker did not eliminate the other player.", 2, battleResults[3]);
         assertEquals("Incorrect minimum movement of armies into captured country.", 3, battleResults[4]);
         assertEquals("Incorrect maximum movement of armies into captured country.", 3, battleResults[5]);
+
+        assertEquals(RiskGame.STATE_BATTLE_WON, game.getState());
+    }
+
+    public void testMoveArmies() {
+        doWinningBattleCyanAgainstGreen();
+
+        assertTrue(game.moveArmies(3) != 0);
+        assertEquals(1, country0.getArmies());
+        assertEquals(3, country1.getArmies());
+        assertEquals(RiskGame.STATE_ATTACKING, game.getState());
+    }
+
+    public void testMoveAll() {
+        doWinningBattleCyanAgainstGreen();
+
+        assertEquals(3, game.moveAll());
     }
 
 }
