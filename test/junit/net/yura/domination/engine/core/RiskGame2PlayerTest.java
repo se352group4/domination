@@ -30,6 +30,7 @@ public class RiskGame2PlayerTest extends TestCase {
     private Player cyanPlayer;
     private Player greenPlayer;
 
+    @Override
     protected void setUp() throws Exception {
         super.setUp();
 
