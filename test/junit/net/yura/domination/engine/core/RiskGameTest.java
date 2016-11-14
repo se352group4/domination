@@ -681,4 +681,66 @@ public class RiskGameTest extends TestCase {
         assertEquals(3, instance.getNoAttackDice());
     }
 
+    public void testGetNoDefenseDice() {
+        getToSetupDone();
+
+        //PLAYER 1
+        assertEquals(plr1, instance.getCurrentPlayer());
+        assertEquals(3, plr1.getExtraArmies());
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        assertEquals(0, plr1.getExtraArmies());
+        instance.endGo();
+
+        assertEquals(RiskGame.STATE_ATTACKING, instance.getState());
+
+        instance.attack(countries[0], countries[1]);
+
+        assertEquals(3, instance.getNoAttackDice());
+        assertEquals(1, instance.getNoDefendDice());
+
+        instance.retreat();
+        instance.endAttack();
+        instance.noMove();
+        countries[0].removeArmies(2);
+        instance.endGo();
+
+        //PLAYER 2
+        assertEquals(plr2, instance.getCurrentPlayer());
+        assertEquals(3, plr2.getExtraArmies());
+        assertEquals(1, instance.placeArmy(countries[1], 1));
+        assertEquals(1, instance.placeArmy(countries[1], 1));
+        assertEquals(1, instance.placeArmy(countries[1], 1));
+        assertEquals(0, plr1.getExtraArmies());
+        instance.endGo();
+
+        assertEquals(RiskGame.STATE_ATTACKING, instance.getState());
+
+        instance.attack(countries[1], countries[0]);
+
+        assertEquals(3, instance.getNoAttackDice());
+        assertEquals(2, instance.getNoDefendDice());
+
+        instance.retreat();
+        instance.endAttack();
+        instance.noMove();
+        instance.endGo();
+
+        //PLAYER 1
+        assertEquals(plr1, instance.getCurrentPlayer());
+        assertEquals(3, plr1.getExtraArmies());
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        assertEquals(0, plr1.getExtraArmies());
+        instance.endGo();
+
+        assertEquals(RiskGame.STATE_ATTACKING, instance.getState());
+
+        instance.attack(countries[0], countries[1]);
+
+        assertEquals(3, instance.getNoAttackDice());
+        assertEquals(3, instance.getNoDefendDice());
+    }
 }
