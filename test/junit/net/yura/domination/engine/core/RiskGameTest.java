@@ -8,6 +8,8 @@ import net.yura.domination.engine.RiskUIUtil;
 
 public class RiskGameTest extends TestCase {
     
+    private RiskGame instance;
+
     private Continent continent;
     private Country country1;
     private Country country2;
@@ -28,7 +30,15 @@ public class RiskGameTest extends TestCase {
 
     protected void setUp() throws Exception {
         super.setUp();
-        
+
+        try {
+            RiskUIUtil.mapsdir = new File("./game/Domination/maps").toURI().toURL();
+            instance = new RiskGame();
+        }
+        catch(Exception ex) {
+            throw new RuntimeException(ex);
+        }
+
         continent = new Continent("timmay", "North Murca", 5, 8);
         country1 = new Country(0, "1", "zimbabwe", continent, 100, 100);
         country2 = new Country(1, "2", "Djibouti", continent, 200, 200);
@@ -44,26 +54,12 @@ public class RiskGameTest extends TestCase {
         p2 = new Player(0, "tester2", 9, "there");
     }
 
-    protected void tearDown() throws Exception {
-        super.tearDown();
-    }
-
     /**
      * Test of trade method, of class RiskGame.
      */
     public void testTrade() {
         System.out.println("trade");
-      
-        RiskGame instance;
 
-        try {
-            RiskUIUtil.mapsdir = new File("./game/Domination/maps").toURI().toURL();
-            instance = new RiskGame();
-        }
-        catch(Exception ex) {
-            throw new RuntimeException(ex);
-        }
-        
         //Country country =  new Country(1, "name", "Full Name", new Continent("name", "Full Name", 5, 0xFFFF0000), 10, 10);
         // 3 different cards = there are 24 combinations
 
@@ -382,16 +378,6 @@ public class RiskGameTest extends TestCase {
 
     public void testAddDelPlayers()
     {
-        RiskGame instance;
-
-        try {
-            RiskUIUtil.mapsdir = new File("./game/Domination/maps").toURI().toURL();
-            instance = new RiskGame();
-        }
-        catch(Exception ex) {
-            throw new RuntimeException(ex);
-        }
-        
         assertFalse(instance.delPlayer("tester"));
         
         assertTrue(instance.addPlayer(0, "tester", 7, "here"));
@@ -413,18 +399,8 @@ public class RiskGameTest extends TestCase {
         assertFalse(instance.delPlayer("tester"));
     }
     
-    private RiskGame checkPlayerWonSetup()
+    private void addPlayersAndStart()
     {
-        RiskGame instance;
-
-        try {
-            RiskUIUtil.mapsdir = new File("./game/Domination/maps").toURI().toURL();
-            instance = new RiskGame();
-        }
-        catch(Exception ex) {
-            throw new RuntimeException(ex);
-        }
-        
         try {
             // Add three players
             instance.addPlayer(0, "tester1", 1, "one");
@@ -437,19 +413,18 @@ public class RiskGameTest extends TestCase {
         catch(Exception ex) {
             fail();
         }
-        return instance;
     }
 
     public void testCheckPlayerWonImmediate()
     {
-        RiskGame instance = checkPlayerWonSetup();
+        addPlayersAndStart();
         // No player should have won right after the game starts
         assertFalse(instance.checkPlayerWon());
     }
 
     public void testCheckPlayerWonWithAllCountries()
     {
-        RiskGame instance = checkPlayerWonSetup();
+        addPlayersAndStart();
         
         // Set up the player to win
         instance.setCurrentPlayer(1);
@@ -466,7 +441,7 @@ public class RiskGameTest extends TestCase {
     
     public void testCheckPlayerWonWithAllButOneCountries()
     {
-        RiskGame instance = checkPlayerWonSetup();
+        addPlayersAndStart();
         
         // Set up the player to win
         instance.setCurrentPlayer(1);
@@ -484,7 +459,7 @@ public class RiskGameTest extends TestCase {
 
     public void testNoEmptyCountries()
     {
-        RiskGame instance = checkPlayerWonSetup();
+        addPlayersAndStart();
 
         //There are empty countries initially
         assertFalse(instance.NoEmptyCountries());
@@ -510,7 +485,7 @@ public class RiskGameTest extends TestCase {
     
     public void testGetConnectedEmpire()
     {
-        RiskGame instance = checkPlayerWonSetup();
+        addPlayersAndStart();
         
         
         
@@ -575,7 +550,7 @@ public class RiskGameTest extends TestCase {
      
     public void testRollDice()
     {
-        RiskGame instance = checkPlayerWonSetup();
+        addPlayersAndStart();
         
         int lastDie = 0;
         
@@ -593,7 +568,7 @@ public class RiskGameTest extends TestCase {
     
     public void testFindCardAndRemoveIt()
     {
-        RiskGame instance = checkPlayerWonSetup();
+        addPlayersAndStart();
         int count = instance.getCards().size();
         assertEquals(Card.WILDCARD, instance.findCardAndRemoveIt(Card.WILDCARD).getName());
         count -= 1;
@@ -606,7 +581,7 @@ public class RiskGameTest extends TestCase {
     
     public void testGetCards()       
     {
-        RiskGame instance = checkPlayerWonSetup();
+        addPlayersAndStart();
         
         instance.setCurrentPlayer(00);
         
@@ -622,82 +597,74 @@ public class RiskGameTest extends TestCase {
     }
 
     public void testMoveArmiesDuringAttack() {
-        RiskGame game;
-        try {
-            RiskUIUtil.mapsdir = new File("./game/Domination/maps").toURI().toURL();
-            game = new RiskGame();
-        } catch (Exception ex) {
-            throw new RuntimeException(ex);
-        }
-
         String cyanPlayerName = "cyan_player";
         String greenPlayerName = "green_player";
 
-        assertTrue(game.addPlayer(Player.PLAYER_HUMAN, cyanPlayerName, ColorUtil.CYAN, "address"));
-        assertTrue(game.addPlayer(Player.PLAYER_HUMAN, greenPlayerName, ColorUtil.GREEN, "address"));
+        assertTrue(instance.addPlayer(Player.PLAYER_HUMAN, cyanPlayerName, ColorUtil.CYAN, "address"));
+        assertTrue(instance.addPlayer(Player.PLAYER_HUMAN, greenPlayerName, ColorUtil.GREEN, "address"));
 
         try {
-            game.startGame(RiskGame.MODE_DOMINATION, RiskGame.CARD_INCREASING_SET, true, false);
+            instance.startGame(RiskGame.MODE_DOMINATION, RiskGame.CARD_INCREASING_SET, true, false);
         } catch (Exception ex) {
             throw new RuntimeException(ex);
         }
 
-        Country[] countries = game.getCountries();
+        Country[] countries = instance.getCountries();
         assertTrue(countries.length >= 2);
         assertTrue(countries[0].isNeighbours(countries[1]));
 
-        Vector players = game.getPlayers();
+        Vector players = instance.getPlayers();
         assertEquals(2, players.size());
 
-        assertEquals(RiskGame.STATE_PLACE_ARMIES, game.getState());
-        assertFalse(game.getSetupDone());
+        assertEquals(RiskGame.STATE_PLACE_ARMIES, instance.getState());
+        assertFalse(instance.getSetupDone());
 
-        Player cyanPlayer = game.getPlayer(cyanPlayerName);
-        Player greenPlayer = game.getPlayer(greenPlayerName);
+        Player cyanPlayer = instance.getPlayer(cyanPlayerName);
+        Player greenPlayer = instance.getPlayer(greenPlayerName);
 
         assertEquals(40, cyanPlayer.getExtraArmies());
         assertEquals(40, greenPlayer.getExtraArmies());
         cyanPlayer.loseExtraArmy(39);
         greenPlayer.loseExtraArmy(39);
 
-        game.setCurrentPlayer(0);
+        instance.setCurrentPlayer(0);
 
-        assertEquals(cyanPlayer, game.getCurrentPlayer());
-        assertEquals(1, game.placeArmy(countries[0], 1));
-        game.endGo();
+        assertEquals(cyanPlayer, instance.getCurrentPlayer());
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        instance.endGo();
 
-        assertEquals(greenPlayer, game.getCurrentPlayer());
-        assertEquals(1, game.placeArmy(countries[1], 1));
-        game.endGo();
+        assertEquals(greenPlayer, instance.getCurrentPlayer());
+        assertEquals(1, instance.placeArmy(countries[1], 1));
+        instance.endGo();
 
-        assertTrue(game.getSetupDone());
+        assertTrue(instance.getSetupDone());
 
-        assertEquals(cyanPlayer, game.getCurrentPlayer());
+        assertEquals(cyanPlayer, instance.getCurrentPlayer());
         assertEquals(3, cyanPlayer.getExtraArmies());
-        assertEquals(1, game.placeArmy(countries[0], 1));
-        assertEquals(1, game.placeArmy(countries[0], 1));
-        assertEquals(1, game.placeArmy(countries[0], 1));
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        assertEquals(1, instance.placeArmy(countries[0], 1));
+        assertEquals(1, instance.placeArmy(countries[0], 1));
         assertEquals(0, cyanPlayer.getExtraArmies());
 
         assertEquals(4, countries[0].getArmies());
         assertEquals(1, countries[1].getArmies());
 
-        assertEquals(RiskGame.STATE_ATTACKING, game.getState());
-        assertTrue(game.attack(countries[0], countries[1]));
+        assertEquals(RiskGame.STATE_ATTACKING, instance.getState());
+        assertTrue(instance.attack(countries[0], countries[1]));
 
-        assertEquals(RiskGame.STATE_ROLLING, game.getState());
-        assertEquals(3, game.getNoAttackDice());
-        assertTrue(game.rollA(3));
-        assertEquals(3, game.getAttackerDice());
+        assertEquals(RiskGame.STATE_ROLLING, instance.getState());
+        assertEquals(3, instance.getNoAttackDice());
+        assertTrue(instance.rollA(3));
+        assertEquals(3, instance.getAttackerDice());
         int[] attackerRoll = new int[]{6, 6, 6};
 
-        assertEquals(RiskGame.STATE_DEFEND_YOURSELF, game.getState());
-        assertEquals(1, game.getNoDefendDice());
-        assertTrue(game.rollD(1));
-        assertEquals(1, game.getDefenderDice());
+        assertEquals(RiskGame.STATE_DEFEND_YOURSELF, instance.getState());
+        assertEquals(1, instance.getNoDefendDice());
+        assertTrue(instance.rollD(1));
+        assertEquals(1, instance.getDefenderDice());
         int[] defenderRoll = new int[]{1};
 
-        int[] battleResults = game.battle(attackerRoll, defenderRoll);
+        int[] battleResults = instance.battle(attackerRoll, defenderRoll);
         assertEquals("RiskGame.battle(int[], int[]) failed", 1, battleResults[0]);
 
         assertEquals("Incorrect number of attacker armies lost", 0, battleResults[1]);
@@ -707,10 +674,10 @@ public class RiskGameTest extends TestCase {
         assertEquals("Incorrect minimum movement of armies into captured country.", 3, battleResults[4]);
         assertEquals("Incorrect maximum movement of armies into captured country.", 3, battleResults[5]);
 
-        assertEquals(RiskGame.STATE_BATTLE_WON, game.getState());
-        assertTrue(game.isCapturedCountry());
-        assertEquals("Attacker should be able to move 3 of the 4 armies to the captured country.", 3, game.moveAll());
-        assertTrue("RiskGame.moveArmies failed.", game.moveArmies(3) != 0);
+        assertEquals(RiskGame.STATE_BATTLE_WON, instance.getState());
+        assertTrue(instance.isCapturedCountry());
+        assertEquals("Attacker should be able to move 3 of the 4 armies to the captured country.", 3, instance.moveAll());
+        assertTrue("RiskGame.moveArmies failed.", instance.moveArmies(3) != 0);
         assertEquals(cyanPlayer, countries[0].getOwner());
         assertEquals(cyanPlayer, countries[1].getOwner());
         assertEquals(1, countries[0].getArmies());
