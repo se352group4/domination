@@ -644,6 +644,7 @@ public class RiskGameTest extends TestCase {
 
         Country[] countries = game.getCountries();
         assertTrue(countries.length >= 2);
+        assertTrue(countries[0].isNeighbours(countries[1]));
 
         Vector players = game.getPlayers();
         assertEquals(2, players.size());
@@ -662,29 +663,58 @@ public class RiskGameTest extends TestCase {
         game.setCurrentPlayer(0);
 
         assertEquals(cyanPlayer, game.getCurrentPlayer());
-        game.placeArmy(countries[0], 1);
+        assertEquals(1, game.placeArmy(countries[0], 1));
         game.endGo();
 
         assertEquals(greenPlayer, game.getCurrentPlayer());
-        game.placeArmy(countries[1], 1);
+        assertEquals(1, game.placeArmy(countries[1], 1));
         game.endGo();
+
+        assertTrue(game.getSetupDone());
 
         assertEquals(cyanPlayer, game.getCurrentPlayer());
-        game.placeArmy(countries[0], 1);
-        game.placeArmy(countries[0], 1);
-        game.placeArmy(countries[0], 1);
-        assertEquals(RiskGame.STATE_ATTACKING, game.getState());
+        assertEquals(3, cyanPlayer.getExtraArmies());
+        assertEquals(1, game.placeArmy(countries[0], 1));
+        assertEquals(1, game.placeArmy(countries[0], 1));
+        assertEquals(1, game.placeArmy(countries[0], 1));
         assertEquals(0, cyanPlayer.getExtraArmies());
 
-        game.endAttack();
-        game.noMove();
-        game.endGo();
+        assertEquals(4, countries[0].getArmies());
+        assertEquals(1, countries[1].getArmies());
 
-        assertEquals(greenPlayer, game.getCurrentPlayer());
-        game.placeArmy(countries[1], 1);
-        game.endGo();
+        assertEquals(RiskGame.STATE_ATTACKING, game.getState());
+        assertTrue(game.attack(countries[0], countries[1]));
 
-        fail("prototype");
+        assertEquals(RiskGame.STATE_ROLLING, game.getState());
+        assertEquals(3, game.getNoAttackDice());
+        assertTrue(game.rollA(3));
+        assertEquals(3, game.getAttackerDice());
+        int[] attackerRoll = new int[]{6, 6, 6};
+
+        assertEquals(RiskGame.STATE_DEFEND_YOURSELF, game.getState());
+        assertEquals(1, game.getNoDefendDice());
+        assertTrue(game.rollD(1));
+        assertEquals(1, game.getDefenderDice());
+        int[] defenderRoll = new int[]{1};
+
+        int[] battleResults = game.battle(attackerRoll, defenderRoll);
+        assertEquals("RiskGame.battle(int[], int[]) failed", 1, battleResults[0]);
+
+        assertEquals("Incorrect number of attacker armies lost", 0, battleResults[1]);
+        assertEquals("Incorrect number of defender armies lost", 1, battleResults[2]);
+        assertTrue("The battle results incorrectly indicates that the attacker lost.", battleResults[3] != 0);
+        assertEquals("The battle results incorrectly indicates that the attacker did not eliminate the other player.", 2, battleResults[3]);
+        assertEquals("Incorrect minimum movement of armies into captured country.", 3, battleResults[4]);
+        assertEquals("Incorrect maximum movement of armies into captured country.", 3, battleResults[5]);
+
+        assertEquals(RiskGame.STATE_BATTLE_WON, game.getState());
+        assertTrue(game.isCapturedCountry());
+        assertEquals("Attacker should be able to move 3 of the 4 armies to the captured country.", 3, game.moveAll());
+        assertTrue("RiskGame.moveArmies failed.", game.moveArmies(3) != 0);
+        assertEquals(cyanPlayer, countries[0].getOwner());
+        assertEquals(cyanPlayer, countries[1].getOwner());
+        assertEquals(1, countries[0].getArmies());
+        assertEquals(3, countries[1].getArmies());
     }
 
 }
