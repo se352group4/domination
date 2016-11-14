@@ -20,6 +20,7 @@ public class AISimulationTest extends TestCase{
 	int other;
 	
 	public void testSomething() throws InterruptedException {
+                fail("testSomething waits for the user to locate luca.map and crashes when not selected");
 		RiskUIUtil.parseArgs(new String[] {});
 		final Risk risk = new Risk();
 		risk.addRiskListener(new RiskAdapter() {
