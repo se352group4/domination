@@ -147,5 +147,30 @@ public class RiskGame2PlayerTest extends TestCase {
 
         assertEquals(3, game.moveAll());
     }
+    
+    public void testRetreat() {
+        assertEquals(RiskGame.STATE_ATTACKING, game.getState());
+        assertFalse(game.retreat());
+        
+        int[] attackerRoll = new int[]{5, 5, 5};
+        int[] defenderRoll = new int[]{6};
+        
+        game.attack(country0, country1);
+        
+        assertEquals(RiskGame.STATE_ROLLING, game.getState());
+        assertTrue(game.retreat());
+        
+        game.rollA(3);
+        game.rollD(1);
+        
+        //System.out.println(game.getState());
+        
+        game.battle(attackerRoll, defenderRoll);
+        
+        //System.out.println(game.getState());
+        System.out.println(country0.getArmies());
+        System.out.println(country1.getArmies());
+        // Why are the armies not decreasing?
+    }
 
 }
