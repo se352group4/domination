@@ -743,4 +743,176 @@ public class RiskGameTest extends TestCase {
         assertEquals(3, instance.getNoAttackDice());
         assertEquals(3, instance.getNoDefendDice());
     }
+    public void testCanContinueDomination() {
+        addPlayersAndStart();
+
+        // start domination game
+        try {
+            instance.startGame(0, 0, true, true);
+        }
+        catch(Exception ex) {
+            fail();
+        }
+        // Set up the player to win
+        instance.setCurrentPlayer(1);
+        Player plyr = instance.getCurrentPlayer();
+
+        // Set up the play to own all the countries
+        for(Country c : instance.getCountries()){
+            c.setOwner(plyr);
+        }
+
+        instance.checkPlayerWon();
+
+        // Player can not continue because game is domination
+        assertFalse(instance.canContinue());
+    }
+
+    public void testCanContinueNoWinNotDom() {
+        addPlayersAndStart();
+
+        // start capital game
+        try {
+            instance.startGame(2, 0, true, true);
+        }
+        catch(Exception ex) {
+            fail();
+        }
+        instance.setCurrentPlayer(1);
+        Player plyr = instance.getCurrentPlayer();
+
+        // give player 1 country
+        instance.getCountries()[0].setOwner(plyr);
+
+        // player has not won so game state is not game over
+        instance.checkPlayerWon();
+
+        // Player can not continue because current game is not finished
+        assertFalse(instance.canContinue());
+    }
+    private RiskGame game;
+    private static final String CYAN_PLAYER_NAME = "cyan_player";
+    private static final String GREEN_PLAYER_NAME = "green_player";
+    private static final int DEFAULT_INITIAL_EXTRA_ARMIES = 40;
+    private static final int TEST_WITH_EXTRA_ARMIES = 1;
+    private static final int INITIAL_ARMIES_TO_REMOVE = DEFAULT_INITIAL_EXTRA_ARMIES - TEST_WITH_EXTRA_ARMIES;
+    private Country country0; // Owned by the cyan player
+    
+    private Player cyanPlayer;
+    private Player greenPlayer;
+    public void capitalSetup() {
+
+        try {
+            RiskUIUtil.mapsdir = new File("./game/Domination/maps").toURI().toURL();
+            game = new RiskGame();
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+
+        game.addPlayer(Player.PLAYER_HUMAN, CYAN_PLAYER_NAME, ColorUtil.CYAN, "address");
+        game.addPlayer(Player.PLAYER_HUMAN, GREEN_PLAYER_NAME, ColorUtil.GREEN, "address");
+
+        try {
+            game.startGame(RiskGame.MODE_CAPITAL, RiskGame.CARD_INCREASING_SET, true, false);
+        } catch (Exception ex) {
+            throw new RuntimeException(ex);
+        }
+
+        country0 = game.getCountries()[0];
+        country1 = game.getCountries()[1];
+        cyanPlayer = game.getPlayer(CYAN_PLAYER_NAME);
+        greenPlayer = game.getPlayer(GREEN_PLAYER_NAME);
+
+        cyanPlayer.loseExtraArmy(INITIAL_ARMIES_TO_REMOVE);
+        greenPlayer.loseExtraArmy(INITIAL_ARMIES_TO_REMOVE);
+
+        game.setCurrentPlayer(0);
+
+        // Cyan player's turn
+        game.placeArmy(country0, 1);
+        game.endGo();
+
+        game.setCurrentPlayer(1);
+        // Green  player's turn
+        game.placeArmy(country1, 1);
+        game.endGo();
+
+        // Cyan player's turn with 3 armies left to place
+        game.placeArmy(country0, 1);
+        game.placeArmy(country0, 1);
+        game.placeArmy(country0, 1);
+    }
+
+    public void testCanContinueDomWinNotDom() {
+        addPlayersAndStart();
+
+        // start capital game
+        try {
+            instance.startGame(2, 0, true, true);
+        }
+        catch(Exception ex) {
+            fail();
+        }
+        // Set up the player to win
+        instance.setCurrentPlayer(1);
+        Player plyr = instance.getCurrentPlayer();
+
+        // Set up the play to own all the countries
+        for(Country c : instance.getCountries()){
+            c.setOwner(plyr);
+        }
+
+        instance.checkPlayerWon();
+
+        // Player can not continue because they already have all countries
+        assertFalse(instance.canContinue());
+    }
+//    public void testCheckPlayerWonCapital() {
+//
+//        // start capital game
+//        capitalSetup();
+//        // Set up the player to win
+//        game.setCurrentPlayer(0);
+//        assertTrue(game.setCapital(country0));
+//        assertEquals(country0, game.getCurrentPlayer().getCapital());
+//
+//        game.endGo();
+//        assertEquals(game.getState(), RiskGame.STATE_SELECT_CAPITAL);
+//        game.setCapital(country1);
+//        assertTrue(game.setCapital(country1));
+//        assertEquals(country1, game.getCurrentPlayer().getCapital());
+//
+//        game.setCurrentPlayer(0);
+//        country0.setOwner(game.getCurrentPlayer());
+//        country1.setOwner(game.getCurrentPlayer());
+//        game.getCurrentPlayer().newCountry(country0);
+//        game.getCurrentPlayer().newCountry(country1);
+//
+//
+//        // Player can continue because they won capital mode but dont own all countries
+//        assertTrue(game.checkPlayerWon());
+//    }
+
+////    public void testCanContinueWinCapital() {
+////
+////
+////        // start capital game
+////        capitalSetup();
+////        // Set up the player to win
+////        game.setCurrentPlayer(0);
+////        game.setCapital(country0);
+////
+////        game.setCurrentPlayer(1);
+////        game.setCapital(country1);
+////
+////        game.setCurrentPlayer(0);
+////        country0.setOwner(game.getCurrentPlayer());
+////        country1.setOwner(game.getCurrentPlayer());
+////        game.getCurrentPlayer().newCountry(country0);
+////        game.getCurrentPlayer().newCountry(country1);
+////
+////        game.checkPlayerWon();
+////        assertTrue(game.canContinue());
+//
+//    }
 }
