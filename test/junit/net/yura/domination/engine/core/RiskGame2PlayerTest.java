@@ -13,9 +13,10 @@ import net.yura.domination.engine.RiskUIUtil;
  * with recycle cards and the 3 dice options off (see the options for the
  * RiskGame constructor).
  *
- * Cyan starts with 4 armies on country0 and Green starts with 1 army on
- * country1. All other countries have no armies. At the start of each test, it
- * is Cyan's turn to attack (RiskGame is in the STATE_ATTACKING state).
+ * Cyan starts with 4 armies on country0 and one army on country2. Green starts
+ * with 1 army on country1 and country3. All other countries have no armies. At
+ * the start of each test, it is Cyan's turn to attack (RiskGame is in the
+ * STATE_ATTACKING state).
  */
 public class RiskGame2PlayerTest extends TestCase {
 
@@ -23,10 +24,12 @@ public class RiskGame2PlayerTest extends TestCase {
     private static final String CYAN_PLAYER_NAME = "cyan_player";
     private static final String GREEN_PLAYER_NAME = "green_player";
     private static final int DEFAULT_INITIAL_EXTRA_ARMIES = 40;
-    private static final int TEST_WITH_EXTRA_ARMIES = 1;
+    private static final int TEST_WITH_EXTRA_ARMIES = 2;
     private static final int INITIAL_ARMIES_TO_REMOVE = DEFAULT_INITIAL_EXTRA_ARMIES - TEST_WITH_EXTRA_ARMIES;
     private Country country0; // Owned by the cyan player
     private Country country1; // Owned by the green player
+    private Country country2; // Owned by the cyan player
+    private Country country3; // Owned by the green player
     private Player cyanPlayer;
     private Player greenPlayer;
 
@@ -52,6 +55,8 @@ public class RiskGame2PlayerTest extends TestCase {
 
         country0 = game.getCountries()[0];
         country1 = game.getCountries()[1];
+        country2 = game.getCountries()[2];
+        country3 = game.getCountries()[3];
         cyanPlayer = game.getPlayer(CYAN_PLAYER_NAME);
         greenPlayer = game.getPlayer(GREEN_PLAYER_NAME);
 
@@ -60,15 +65,23 @@ public class RiskGame2PlayerTest extends TestCase {
 
         game.setCurrentPlayer(0);
 
-        // Cyan player's turn
+        // Cyan player's turn to place initial armies
         game.placeArmy(country0, 1);
         game.endGo();
 
-        // Green  player's turn
+        // Green  player's turn to place initial armies
         game.placeArmy(country1, 1);
         game.endGo();
 
-        // Cyan player's turn with 3 armies left to place
+        // Cyan player's turn to place initial armies
+        game.placeArmy(country2, 1);
+        game.endGo();
+
+        // Green player's turn to place initial armies
+        game.placeArmy(country3, 1);
+        game.endGo();
+
+        // Cyan player's turn
         game.placeArmy(country0, 1);
         game.placeArmy(country0, 1);
         game.placeArmy(country0, 1);
@@ -77,9 +90,16 @@ public class RiskGame2PlayerTest extends TestCase {
     public void testSetup() {
         assertEquals(cyanPlayer, game.getCurrentPlayer());
         assertEquals(RiskGame.STATE_ATTACKING, game.getState());
-        assertEquals(4, country0.getArmies());
-        assertEquals(1, country1.getArmies());
         assertTrue(game.getSetupDone());
+
+        assertEquals(4, country0.getArmies());
+        assertEquals(cyanPlayer, country0.getOwner());
+        assertEquals(1, country1.getArmies());
+        assertEquals(greenPlayer, country1.getOwner());
+        assertEquals(1, country2.getArmies());
+        assertEquals(cyanPlayer, country2.getOwner());
+        assertEquals(1, country3.getArmies());
+        assertEquals(greenPlayer, country3.getOwner());
     }
 
     /**
@@ -126,7 +146,6 @@ public class RiskGame2PlayerTest extends TestCase {
         assertEquals("Incorrect number of attacker armies lost", 0, battleResults[1]);
         assertEquals("Incorrect number of defender armies lost", 1, battleResults[2]);
         assertTrue("The battle results incorrectly indicates that the attacker lost.", battleResults[3] != 0);
-        assertEquals("The battle results incorrectly indicates that the attacker did not eliminate the other player.", 2, battleResults[3]);
         assertEquals("Incorrect minimum movement of armies into captured country.", 3, battleResults[4]);
         assertEquals("Incorrect maximum movement of armies into captured country.", 3, battleResults[5]);
 
@@ -173,4 +192,11 @@ public class RiskGame2PlayerTest extends TestCase {
         // Why are the armies not decreasing?
     }
 
+    public void testMoveArmy() {
+        game.endAttack();
+        assertTrue(game.moveArmy(country0, country2, 1));
+        assertEquals(3, country0.getArmies());
+        assertEquals(2, country2.getArmies());
+        assertEquals(RiskGame.STATE_END_TURN, game.getState());
+    }
 }
