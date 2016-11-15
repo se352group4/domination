@@ -1305,7 +1305,7 @@ transient - A keyword in the Java programming language that indicates that a fie
 	 * @param c The capital country
 	 * @return boolean Returns true if the country is set as the capital, returns false otherwise
 	 */
-	public boolean setCapital(Country c) {
+	 public boolean setCapital(Country c) {
 
 		if (gameState== STATE_SELECT_CAPITAL && gameMode == 2 && c.getOwner()==currentPlayer && currentPlayer.getCapital()==null) {
 
@@ -1486,19 +1486,18 @@ transient - A keyword in the Java programming language that indicates that a fie
 
         public boolean canContinue() {
 
-		if (gameState==STATE_GAME_OVER && gameMode != MODE_DOMINATION && gameMode != 1) {
+			if (gameState==STATE_GAME_OVER && gameMode != MODE_DOMINATION && gameMode != 1) {
 
-			int oldGameMode=gameMode;
-			gameMode=MODE_DOMINATION;
-			boolean playerWon = checkPlayerWon();
-                        gameMode=oldGameMode;
+				int oldGameMode=gameMode;
+				gameMode=MODE_DOMINATION;
+				boolean playerWon = checkPlayerWon();
+				gameMode=oldGameMode;
 
-                        return !playerWon; // we CAN continue if someone has NOT won
+				return !playerWon; // we CAN continue if someone has NOT won
 
-                }
-                return false;
-
-        }
+			}
+				return false;
+		}
 
 	public boolean continuePlay() {
 
